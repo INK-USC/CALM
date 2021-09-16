@@ -1,11 +1,11 @@
 import spacy
-import json
 import argparse
 from tqdm import tqdm
 import numpy as np
-import copy
-import random
 import os
+from generator.concept.concept_generator import *
+
+generator = ConceptGenerator()
 
 nlp = spacy.load('en_core_web_sm')
 
@@ -19,17 +19,10 @@ def match_sents(sent_path, num_batch, batch_id):
     for index, sent in enumerate(tqdm(batch_sents, desc="Batch ID: %d" % batch_id)):
         if sent == "":
             continue
-        doc = nlp(str(sent))
-        matched_concepts = []
-        for token in doc:
-            if (token.pos_.startswith('V') or token.pos_.startswith('PROP')) and token.is_alpha and not token.is_stop:
-                matched_concepts.append(token.lemma_)
-        for noun_chunk in doc.noun_chunks:
-            root_noun = noun_chunk[-1]
-            if root_noun.pos_ == "NOUN":
-                matched_concepts.append(root_noun.lemma_)
 
-        result.append({"sentence": sent, "matched_concepts": matched_concepts})
+        concepts = generator.c2s_generate(str(sent))
+
+        result.append({"sentence": sent, "matched_concepts": concepts})
     return result
 
 
@@ -44,7 +37,7 @@ batch_result = match_sents(sent_path=os.path.join(args.input_path, "wiki.train.r
 
 with open(os.path.join(args.save_path, "train.source"), "w") as f:
     for line in batch_result:
-        f.write("generate a sentence with the following concepts: "+' '.join(line["matched_concepts"])+'\n')
+        f.write("generate a sentence with the following concepts: "+line["matched_concepts"]+'\n')
 
 with open(os.path.join(args.save_path, "train.target"), "w") as f:
     for line in batch_result:
@@ -52,10 +45,10 @@ with open(os.path.join(args.save_path, "train.target"), "w") as f:
 
 batch_result = match_sents(sent_path=os.path.join(args.input_path, "wiki.valid.raw"), num_batch=args.num_batch, batch_id=args.batch_id)
 
-with open(os.path.join(args.save_path, "valid.source"), "w") as f:
+with open(os.path.join(args.save_path, "dev.source"), "w") as f:
     for line in batch_result:
-        f.write("generate a sentence with the following concepts: "+' '.join(line["matched_concepts"])+'\n')
+        f.write("generate a sentence with the following concepts: "+line["matched_concepts"]+'\n')
 
-with open(os.path.join(args.save_path, "valid.target"), "w") as f:
+with open(os.path.join(args.save_path, "dev.target"), "w") as f:
     for line in batch_result:
         f.write(line["sentence"]+'\n')

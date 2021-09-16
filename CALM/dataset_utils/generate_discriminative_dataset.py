@@ -154,7 +154,7 @@ class Option1Dataset(Dataset):
                 def get_generated_sentence(sentence):
                     # you should decode bytes type to string type
                     generated_sentences = []
-                    generated_sentence = self.generator.generate(sentence.numpy().decode('utf-8'))
+                    generated_sentence = self.generator.cor_generate(sentence.numpy().decode('utf-8'))
                     generated_sentences.append(tf.convert_to_tensor(generated_sentence, dtype=tf.string))
                     return tf.stack(generated_sentences)
 
@@ -366,7 +366,7 @@ class Option2Dataset(Dataset):
                 def get_generated_sentence(sentence):
                     # you should decode bytes type to string type
                     generated_sentences = []
-                    generated_sentence = self.generator.generate(sentence.numpy().decode('utf-8'))
+                    generated_sentence = self.generator.cor_generate(sentence.numpy().decode('utf-8'))
                     generated_sentences.append(tf.convert_to_tensor(generated_sentence, dtype=tf.string))
                     return tf.stack(generated_sentences)
 
@@ -585,7 +585,7 @@ class Option3Dataset(Dataset):
                 def get_generated_sentence(sentence):
                     # you should decode bytes type to string type
                     generated_sentences = []
-                    generated_sentence = self.generator.generate(sentence.numpy().decode('utf-8'))
+                    generated_sentence = self.generator.cor_generate(sentence.numpy().decode('utf-8'))
                     generated_sentences.append(tf.convert_to_tensor(generated_sentence, dtype=tf.string))
                     return tf.stack(generated_sentences)
 
@@ -645,10 +645,10 @@ class Option3Dataset(Dataset):
 
 tokenizer = T5Tokenizer.from_pretrained("t5-base")
 Option2Dataset(tokenizer=tokenizer, data_dir="datasets/wiki", type_path="train", max_len=256)
-Option2Dataset(tokenizer=tokenizer, data_dir="datasets/wiki", type_path="valid", max_len=256)
+Option2Dataset(tokenizer=tokenizer, data_dir="datasets/wiki", type_path="dev", max_len=256)
 
 Option1Dataset(tokenizer=tokenizer, data_dir="datasets/wiki", type_path="train", max_len=256)
-Option1Dataset(tokenizer=tokenizer, data_dir="datasets/wiki", type_path="valid", max_len=256)
+Option1Dataset(tokenizer=tokenizer, data_dir="datasets/wiki", type_path="dev", max_len=256)
 
 Option3Dataset(tokenizer=tokenizer, data_dir="datasets/wiki", type_path="train", max_len=256)
-Option3Dataset(tokenizer=tokenizer, data_dir="datasets/wiki", type_path="valid", max_len=256)
+Option3Dataset(tokenizer=tokenizer, data_dir="datasets/wiki", type_path="dev", max_len=256)

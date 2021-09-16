@@ -5,6 +5,7 @@ from pathlib import Path
 from dataset import Batch, SummarizationDataset
 from typing import Any, Callable, Dict, Mapping, Optional, Sequence, Union
 from trainer import T5FineTuner
+from torch.optim import Optimizer
 import argparse
 import glob, os, re
 from utils import get_best_checkpoint
@@ -47,6 +48,23 @@ class T5GANFineTuner(pl.LightningModule):
                 hparams.model_name_or_path, cache_dir=self.root_path / "model_cache"
             )
 
+        if self.hparams.model_parallel:
+            if "base" in hparams.model_name_or_path:
+                self.device_map = {
+                    0: [0, 1, 2],
+                    1: [3, 4, 5],
+                    2: [6, 7, 8],
+                    3: [9, 10, 11],
+                }
+            else:
+                self.device_map = {
+                    4: [0, 1, 2, 3, 4, 5],
+                    5: [6, 7, 8, 9, 10, 11],
+                    6: [12, 13, 14, 15, 16, 17],
+                    7: [18, 19, 20, 21, 22, 23],
+                }
+            self.model.parallelize(self.device_map)
+
         self.generator_max_length = 128
         self.generator_min_length = 1
 
@@ -64,7 +82,7 @@ class T5GANFineTuner(pl.LightningModule):
                 discriminator_labels=None):
 
         # original sentence / targets
-        device = discriminator_input_ids.device
+        device = self.model.device
         batch_sentences = self.tokenizer.batch_decode(discriminator_input_ids)
         discriminator_labels[discriminator_labels[:, :] == -100] = self.tokenizer.pad_token_id
         batch_labels = self.tokenizer.batch_decode(discriminator_labels)
@@ -99,10 +117,10 @@ class T5GANFineTuner(pl.LightningModule):
                     deleted_idx.append(batch_idx)
                     continue
                 after_option2 = after_option1.split('2: ')
-                option = [after_option2[0].strip(), after_option2[1].strip()]
-                if option[0].strip() == b_label.strip():
+                option = [after_option2[0].strip(), after_option2[1].split('</s>')[0].strip()]
+                if option[0] == b_label.split('</s>')[0].strip():
                     batch_placeholder.append([option, batch_idx, 2]) # need to change second one
-                elif option[1].strip() == b_label.strip():
+                elif option[1] == b_label.split('</s>')[0].strip():
                     batch_placeholder.append([option, batch_idx, 1]) # need to change first one
                 else:
                     deleted_idx.append(batch_idx) # trimmed
@@ -147,7 +165,7 @@ class T5GANFineTuner(pl.LightningModule):
                               attention_mask=generator_input["attention_mask"].to(device),
                               decoder_input_ids=None,
                               decoder_attention_mask=generator_target["attention_mask"].to(device),
-                              lm_labels=generator_labels.to(device))
+                              labels=generator_labels.to(device))
 
         generator_loss = generator_outputs[0]
 
@@ -186,8 +204,8 @@ class T5GANFineTuner(pl.LightningModule):
         discriminator_output = self.model(discriminator_input_regenerated["input_ids"].to(device),
                                           attention_mask=discriminator_input_regenerated["attention_mask"].to(device),
                                           decoder_input_ids=discriminator_decoder_input_ids,
-                                          decoder_attention_mask=discriminator_decoder_attention_mask,
-                                          lm_labels=discriminator_labels)
+                                          decoder_attention_mask=discriminator_decoder_attention_mask.to(device),
+                                          labels=discriminator_labels.to(device))
 
         discriminator_loss = discriminator_output[0]
 

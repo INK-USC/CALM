@@ -21,7 +21,7 @@ def main() -> None:
     parser.add_argument(
         "--output_dir",
         type=str,
-        default="checkpoints/unifiedqa-3b-semeval",
+        default="checkpoints/t5-large",
         help="Path to save the checkpoints.",
     )
     parser.add_argument("--checkpoint_dir", type=str, default="", help="Checkpoint directory.")
@@ -36,13 +36,13 @@ def main() -> None:
     parser.add_argument(
         "--model_name_or_path",
         type=str,
-        default="allenai/unifiedqa-t5-3b",
+        default="t5-large",
         help="Model name or path.",
     )
     parser.add_argument(
         "--tokenizer_name_or_path",
         type=str,
-        default="allenai/unifiedqa-t5-3b",
+        default="t5-large",
         help="Tokenizer name or path.",
     )
 
@@ -110,7 +110,7 @@ def main() -> None:
         prefix="checkpoint_",
         monitor="val_loss",
         mode="min",
-        save_top_k=1,
+        save_top_k=3,
     )
 
     if args.checkpoint_dir:

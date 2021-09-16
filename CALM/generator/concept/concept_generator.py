@@ -30,7 +30,11 @@ class ConceptGenerator:
             else:
                 return False
 
-        result = tf.py_function(check_availability_sentence, [sentence], [tf.bool])[0]
+        if type(sentence) == dict:
+            result = tf.py_function(check_availability_sentence, [sentence['text']], [tf.bool])[0]
+        else:
+            result = tf.py_function(check_availability_sentence, [sentence], [tf.bool])[0]
+
         return result
 
     def cor_generate(self, prompt):
@@ -71,7 +75,7 @@ class ConceptGenerator:
 
         assert len(shuffled_tokens) == len(original_tokens)
 
-        result = ' '.join([token for token in shuffled_tokens])
+        result = ' '.join(shuffled_tokens)
         return result
 
     def c2s_generate(self, prompt):

@@ -13,8 +13,9 @@ def match_sents(sent_path):
     for index, sent in enumerate(tqdm(sents)):
         if sent == "":
             continue
+
         if generator.check_availability(sent):
-            generated_sentence = generator.generate(sent)
+            generated_sentence = generator.cor_generate(sent)
             result.append({"original_sentence": sent, "output_sentence": generated_sentence})
     return result
 
@@ -29,7 +30,7 @@ batch_result = match_sents(sent_path=os.path.join(args.input_path, "wiki.train.r
 
 with open(os.path.join(args.save_path, "train.source"), "w") as f:
     for line in batch_result:
-        f.write("correct the order of the following sentence: "+' '.join(line["output_sentence"])+'\n')
+        f.write("correct the order of the following sentence: "+line["output_sentence"]+'\n')
 
 with open(os.path.join(args.save_path, "train.target"), "w") as f:
     for line in batch_result:
@@ -37,10 +38,10 @@ with open(os.path.join(args.save_path, "train.target"), "w") as f:
 
 batch_result = match_sents(sent_path=os.path.join(args.input_path, "wiki.valid.raw"))
 
-with open(os.path.join(args.save_path, "valid.source"), "w") as f:
+with open(os.path.join(args.save_path, "dev.source"), "w") as f:
     for line in batch_result:
-        f.write("correct the order of the following sentence: "+' '.join(line["output_sentence"])+'\n')
+        f.write("correct the order of the following sentence: "+line["output_sentence"]+'\n')
 
-with open(os.path.join(args.save_path, "valid.target"), "w") as f:
+with open(os.path.join(args.save_path, "dev.target"), "w") as f:
     for line in batch_result:
         f.write(line["original_sentence"]+'\n')

@@ -22,7 +22,7 @@ def get_dataset(tokenizer, type_path, args):
 
     if data_dir_leaf == 'commongen':
         return SummarizationDataset(tokenizer=tokenizer, data_dir=args.data_dir, type_path=type_path, max_source_length=args.max_source_length, max_target_length=args.max_target_length)
-    elif data_dir_leaf == "keyword_lm" or data_dir_leaf == "concept_deshuffling":
+    elif data_dir_leaf == "c2s" or data_dir_leaf == "cor" or data_dir_leaf == "mix":
         return SummarizationDataset(tokenizer=tokenizer, data_dir=args.data_dir, type_path=type_path,max_source_length=args.max_seq_length, max_target_length=args.max_seq_length)
     elif data_dir_leaf == 'option1': # choice of string
         return SummarizationDataset(tokenizer=tokenizer, data_dir=args.data_dir, type_path=type_path, max_source_length=args.max_seq_length, max_target_length=2)
@@ -30,10 +30,6 @@ def get_dataset(tokenizer, type_path, args):
         return SummarizationDataset(tokenizer=tokenizer, data_dir=args.data_dir, type_path=type_path, max_source_length=args.max_seq_length, max_target_length=int(args.max_seq_length / 2))
     elif data_dir_leaf == 'option3': # True / False
         return SummarizationDataset(tokenizer=tokenizer, data_dir=args.data_dir, type_path=type_path, max_source_length=args.max_seq_length, max_target_length=2)
-    elif data_dir_leaf == 'mixed_dataset_key_lm_concept':
-        return SummarizationDataset(tokenizer=tokenizer, data_dir=args.data_dir, type_path=type_path, max_source_length=args.max_seq_length, max_target_length=args.max_seq_length)
-    elif data_dir_leaf == 'mixed_dataset_key_lm_concept_option2':
-        return SummarizationDataset(tokenizer=tokenizer, data_dir=args.data_dir, type_path=type_path, max_source_length=args.max_seq_length, max_target_length=int(args.max_seq_length / 2))
 
     elif data_dir_leaf == 'csqa':
         return CSQADataset(tokenizer=tokenizer, data_dir=args.data_dir, type_path=type_path, max_len=args.max_seq_length)
@@ -67,12 +63,20 @@ class T5FineTuner(pl.LightningModule):  # type: ignore[misc]
         )
 
         if self.hparams.model_parallel:
-            self.device_map = {
-                0: [0, 1, 2, 3, 4, 5],
-                1: [6, 7, 8, 9, 10, 11],
-                2: [12, 13, 14, 15, 16, 17],
-                3: [18, 19, 20, 21, 22, 23],
-            }
+            if "base" in hparams.model_name_or_path:
+                self.device_map = {
+                    0: [0, 1, 2],
+                    1: [3, 4, 5],
+                    2: [6, 7, 8],
+                    3: [9, 10, 11],
+                }
+            else:
+                self.device_map = {
+                    4: [0, 1, 2, 3, 4, 5],
+                    5: [6, 7, 8, 9, 10, 11],
+                    6: [12, 13, 14, 15, 16, 17],
+                    7: [18, 19, 20, 21, 22, 23],
+                }
             self.model.parallelize(self.device_map)
 
     def is_logger(self):

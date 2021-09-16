@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 def getMergedContent(fps1, fpt1, fps2, fpt2, fps3=None, fpt3=None):
     """
@@ -61,60 +62,38 @@ def getMergedContent(fps1, fpt1, fps2, fpt2, fps3=None, fpt3=None):
 
 
 if __name__ == "__main__":
-    concept_fp = open('../datasets/cor/train.source')
-    keyword_fp = open('../datasets/c2s/train.source')
-    option2_fp = open('../datasets/option2/train.source')
+    concept_fp = open('datasets/cor/train.source')
+    keyword_fp = open('datasets/c2s/train.source')
+    option2_fp = open('datasets/option2/train.source')
 
-    concept_fp_t = open('../datasets/cor/train.target')
-    keyword_fp_t = open('../datasets/c2s/train.target')
-    option2_fp_t = open('../datasets/option2/train.target')
+    concept_fp_t = open('datasets/cor/train.target')
+    keyword_fp_t = open('datasets/c2s/train.target')
+    option2_fp_t = open('datasets/option2/train.target')
 
-    valid_concept_fp = open('../datasets/cor/valid.source')
-    valid_keyword_fp = open('../datasets/c2s/valid.source')
-    valid_option2_fp = open('../datasets/option2/valid.source')
+    valid_concept_fp = open('datasets/cor/dev.source')
+    valid_keyword_fp = open('datasets/c2s/dev.source')
+    valid_option2_fp = open('datasets/option2/dev.source')
 
-    valid_concept_fp_t = open('../datasets/cor/valid.target')
-    valid_keyword_fp_t = open('../datasets/c2s/valid.target')
-    valid_option2_fp_t = open('../datasets/option2/valid.target')
+    valid_concept_fp_t = open('datasets/cor/dev.target')
+    valid_keyword_fp_t = open('datasets/c2s/dev.target')
+    valid_option2_fp_t = open('datasets/option2/dev.target')
 
     # For the mixup dataset:
     merged_source_train1, merged_target_train1 = getMergedContent(concept_fp, concept_fp_t, keyword_fp, keyword_fp_t, option2_fp, option2_fp_t)
     merged_source_valid1, merged_target_valid1 = getMergedContent(valid_concept_fp, valid_concept_fp_t, valid_keyword_fp, valid_keyword_fp_t, valid_option2_fp, valid_option2_fp_t)
 
-    output_dir1 = "datasets/mix"
+    output_dir = "datasets/mix"
+    output_dir1 = Path(output_dir)
+    output_dir1.mkdir(parents=True, exist_ok=True)
+
     with open(os.path.join(output_dir1, "train.source"), "w") as f:
         f.write(merged_source_train1)
     with open(os.path.join(output_dir1, "train.target"), "w") as f:
         f.write(merged_target_train1)
-    with open(os.path.join(output_dir1, "valid.source"), "w") as f:
+    with open(os.path.join(output_dir1, "dev.source"), "w") as f:
         f.write(merged_source_valid1)
-    with open(os.path.join(output_dir1, "valid.target"), "w") as f:
+    with open(os.path.join(output_dir1, "dev.target"), "w") as f:
         f.write(merged_target_valid1)
-
-    # # Reset the file pointer to read the file again
-    # concept_fp.seek(0)
-    # keyword_fp.seek(0)
-    # concept_fp_t.seek(0)
-    # keyword_fp_t.seek(0)
-    #
-    # valid_concept_fp.seek(0)
-    # valid_keyword_fp.seek(0)
-    # valid_concept_fp_t.seek(0)
-    # valid_keyword_fp_t.seek(0)
-    #
-    # # For the generator only dataset:
-    # merged_source_train2, merged_target_train2 = getMergedContent(concept_fp, concept_fp_t, keyword_fp, keyword_fp_t)
-    # merged_source_valid2, merged_target_valid2 = getMergedContent(valid_concept_fp, valid_concept_fp_t, valid_keyword_fp, valid_keyword_fp_t)
-    #
-    # output_dir2 = "datasets/mix"
-    # with open(os.path.join(output_dir2, "train.source"), "w") as f:
-    #     f.write(merged_source_train2)
-    # with open(os.path.join(output_dir2, "train.target"), "w") as f:
-    #     f.write(merged_target_train2)
-    # with open(os.path.join(output_dir2, "valid.source"), "w") as f:
-    #     f.write(merged_source_valid2)
-    # with open(os.path.join(output_dir2, "valid.target"), "w") as f:
-    #     f.write(merged_target_valid2)
 
 
 

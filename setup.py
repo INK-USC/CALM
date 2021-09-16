@@ -39,6 +39,9 @@ setuptools.setup(
         "spacy == 2.3.4",
         "tensorboard == 2.2.0",
         "torch == 1.7.0",
-        "transformers == 4.1.1"
+        "transformers",
+        "tensorflow-gpu == 2.1-rc2",
+        "tensorflow-datasets",
+        "protobuf"
     ],
 )
