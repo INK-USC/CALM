@@ -128,5 +128,5 @@ Our released models are listed as following. You can import these models by usin
 | [danny911kr/calm-mix-base](https://huggingface.co/danny911kr/calm-mix-base) | 63.02 | 60.40 | 70.07 | 62.79 | Mix-Only
 | [danny911kr/calm-base](https://huggingface.co/danny911kr/calm-base) | 63.32 | 60.90 | 71.01 | 63.20 | 
 | [danny911kr/calm-mix-large](https://huggingface.co/danny911kr/calm-mix-large) | 70.26 | 62.50 | 73.70 | 75.99 | Mix-Only
-| [danny911kr/calm-large](https://huggingface.co/danny911kr/calm-large) | 71.31 | 63.90 | 76.90 | 82.35 |
+| [danny911kr/calm-large](https://huggingface.co/danny911kr/calm-large) | 71.31 | 66.00 | 75.11 | 77.12 |
 
